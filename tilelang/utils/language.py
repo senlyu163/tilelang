@@ -24,8 +24,7 @@ def _get_buffer(buffer_or_load_or_region: Buffer | BufferLoad | BufferRegion) ->
     elif isinstance(buffer_or_load_or_region, (tir.BufferLoad, tir.BufferRegion)):
         return buffer_or_load_or_region.buffer
     else:
-        raise TypeError(
-            f"Expected Buffer, BufferLoad, or BufferRegion, got {type(buffer_or_load_or_region)}")
+        raise TypeError(f"Expected Buffer, BufferLoad, or BufferRegion, got {type(buffer_or_load_or_region)}")
 
 
 def is_global(buffer: Buffer | BufferLoad | BufferRegion) -> bool:
@@ -153,14 +152,12 @@ def retrieve_func_from_module(ir_module: IRModule) -> PrimFunc:
     """
     if not isinstance(ir_module, IRModule):
         raise ValueError("Not supported type: ", type(ir_module))
-    assert len(ir_module.get_global_vars()) == 1, (
-        "The optimized module should only have one global variable for default schedule.")
+    assert len(ir_module.get_global_vars()) == 1, "The optimized module should only have one global variable for default schedule."
     func = list(ir_module.functions.values())[0]
     return func
 
 
-def get_buffer_region_from_load(buffer_load: tir.BufferLoad,
-                                extents: list[PrimExpr] | None = None) -> tir.BufferRegion | None:
+def get_buffer_region_from_load(buffer_load: tir.BufferLoad, extents: list[PrimExpr] | None = None) -> tir.BufferRegion | None:
     """
     Get the buffer region from a buffer load.
 
@@ -193,9 +190,9 @@ def get_buffer_region_from_load(buffer_load: tir.BufferLoad,
         return None
 
 
-def to_buffer_region(obj: Buffer | BufferLoad | BufferRegion | tir.Var,
-                     access_type: str = "rw",
-                     extents: list[PrimExpr] | None = None) -> PrimExpr | BufferRegion:
+def to_buffer_region(
+    obj: Buffer | BufferLoad | BufferRegion | tir.Var, access_type: str = "rw", extents: list[PrimExpr] | None = None
+) -> PrimExpr | BufferRegion:
     """
     Convert to/from the tl.region representation.
 
@@ -203,6 +200,7 @@ def to_buffer_region(obj: Buffer | BufferLoad | BufferRegion | tir.Var,
     - tl.region Call -> returns the decoded BufferRegion for analysis
     """
     from tilelang.language.frame import has_let_value, get_let_value
+
     if isinstance(obj, tir.Var) and has_let_value(obj):
         obj = get_let_value(obj)
     # Encode into tl.region call (when extents is provided), otherwise return BufferRegion for analysis
@@ -279,8 +277,7 @@ def retrieve_stride(obj: Buffer | BufferRegion | BufferLoad) -> list:
     return strides
 
 
-def retrive_ptr_from_buffer_region(buffer_or_load_or_region: Buffer | BufferLoad | BufferRegion,
-                                   access_type: str = "r") -> PrimExpr:
+def retrive_ptr_from_buffer_region(buffer_or_load_or_region: Buffer | BufferLoad | BufferRegion, access_type: str = "r") -> PrimExpr:
     if isinstance(buffer_or_load_or_region, Buffer):
         return buffer_or_load_or_region.access_ptr(access_type)
     elif isinstance(buffer_or_load_or_region, BufferLoad):
@@ -481,3 +478,27 @@ def is_full_region(buffer_region: BufferRegion) -> bool:
         if not expr_equal(r.extent, dim):
             return False
     return True
+
+
+def get_prim_func_name(func: PrimFunc | None, default: str | None = None) -> str | None:
+    """
+    Extract a human‑readable function name from a TVM PrimFunc.
+
+    Prefer the `global_symbol` attribute set on the PrimFunc. If it is missing
+    (e.g., private PrimFunc without a global symbol), return the provided
+    `default` value.
+
+    Args:
+        func: TVM PrimFunc instance or None.
+        default: Fallback name to return when no name can be determined.
+
+    Returns:
+        The function name as a string, or `default` when unavailable.
+    """
+    if func is None:
+        return default
+    try:
+        name = func.attrs["global_symbol"]
+        return str(name) if name is not None else default
+    except Exception:
+        return default

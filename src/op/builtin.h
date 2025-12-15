@@ -55,6 +55,7 @@ static constexpr const char *kLayoutVisualizationEnable =
     "tl.layout_visualization_enable";
 static constexpr const char *kLayoutVisualizationFormats =
     "tl.layout_visualization_formats";
+static constexpr const char *kDeviceCompileFlags = "tl.device_compile_flags";
 /*!
  * \brief Whether to disable dynamic tail split
  *
@@ -599,6 +600,24 @@ TVM_DLL const Op &warp_reduce_bitand();
  * \brief tilelang intrinsic for warp reduction bitor.
  */
 TVM_DLL const Op &warp_reduce_bitor();
+
+/*!
+ * \brief tilelang intrinsic for CUDA read-only cache load (__ldg).
+ *
+ *  This op allows users to explicitly request a non-coherent cached load
+ *  from global memory on CUDA by emitting `__ldg(&ptr[idx])` for 32-bit
+ *  element types on supported architectures. It provides a direct way to
+ *  leverage the read-only data cache for performance-sensitive loads when
+ *  the compiler cannot infer `const __restrict__` automatically.
+ *
+ *  Usage from TVMScript:
+ *    y[i] = T.__ldg(x[i])
+ *
+ *  The op takes one argument preferred as a BufferLoad identifying the
+ *  source element; alternatively, backends may support passing a Buffer and
+ *  index expression.
+ */
+TVM_DLL const Op &__ldg();
 
 } // namespace tl
 } // namespace tvm

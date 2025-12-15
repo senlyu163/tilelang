@@ -6,7 +6,6 @@ from tvm.ir.base import Node
 from tvm.ir import Range
 from tvm.runtime import Scriptable
 import tvm_ffi
-from tilelang.ir import GemmWarpPolicy as GemmWarpPolicy
 from .gemm_mma import GemmMMA
 from .gemm_mma_sm70 import GemmMMASm70
 from .gemm_wgmma import GemmWGMMA
@@ -23,8 +22,7 @@ def gemm_py_infer_layout(gemm_py: GemmMMA, target: Target, thread_bounds: Range)
 
 
 @tvm_ffi.register_global_func("tl.gemm_py.lower")
-def gemm_py_lower(gemm_py: GemmMMA, layout_map, target: Target, thread_bounds: Range,
-                  thread_var: tir.Var):
+def gemm_py_lower(gemm_py: GemmMMA, layout_map, target: Target, thread_bounds: Range, thread_var: tir.Var):
     thread_nums = thread_bounds.extent
     stmt = gemm_py.lower(layout_map, target, thread_nums, thread_var)
     return stmt

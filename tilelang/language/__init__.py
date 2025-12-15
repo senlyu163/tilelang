@@ -1,4 +1,5 @@
 """The language interface for tl programs."""
+
 from __future__ import annotations
 
 # from .parser import *
@@ -58,7 +59,8 @@ from .allocate import (
     empty,  # noqa: F401
 )
 from .copy import copy, c2d_im2col  # noqa: F401
-from .gemm import GemmWarpPolicy, gemm, gemm_v1, gemm_v2  # noqa: F401
+from tilelang.tileop.base import GemmWarpPolicy  # noqa: F401
+from .gemm import gemm, gemm_v1, gemm_v2  # noqa: F401
 from .experimental.gemm_sp import gemm_sp, gemm_sp_v2  # noqa: F401
 from .fill import fill, clear  # noqa: F401
 from .reduce import (
@@ -96,12 +98,16 @@ from .customize import (
 )
 from .logical import any_of, all_of  # noqa: F401
 from .builtin import *  # noqa: F401
+from .builtin import __ldg as __ldg  # noqa: F401
 
 from .utils import index_to_coordinates  # noqa: F401
 
 from .symbolics import dynamic, symbolic  # noqa: F401
 from .annotations import (  # noqa: F401
-    use_swizzle, annotate_layout, annotate_safe_value, annotate_l2_hit_ratio,
+    use_swizzle,
+    annotate_layout,
+    annotate_safe_value,
+    annotate_l2_hit_ratio,
 )
 
 
